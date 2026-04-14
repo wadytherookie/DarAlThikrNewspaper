@@ -116,7 +116,8 @@
 <script>
     async function syncNewspaper() {
         try {
-            const response = await fetch('http://127.0.0.1:8000/status');
+            // Change the syncNewspaper function line to:
+const response = await fetch('https://daralthikrnewspaper.onrender.com/status');
             const data = await response.json();
 
             // 1. Update the Ticker

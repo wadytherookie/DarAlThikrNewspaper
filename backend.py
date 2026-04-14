@@ -1,3 +1,18 @@
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware # Add this import
+
+app = FastAPI()
+
+# THIS IS THE CRITICAL PART FOR RENDER
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allows all websites to talk to your backend
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# ... the rest of your routes (@app.get, @app.post)
 from fastapi import FastAPI, HTTPException, Header
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel

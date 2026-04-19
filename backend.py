@@ -20,21 +20,24 @@ class Article(BaseModel):
     title: str
     description: str
     image_url: str
-    content: str  # <--- NEW: For the "extra info" sub-article
+    sub_image_url: str  # Added this field
+    content: str
 
 class NewspaperData(BaseModel):
     ticker_text: str
     articles: List[Article]
 
+# Initialized database with the new structure
 db = {
-    "ticker_text": "Welcome to The Al-Thikr Times.",
+    "ticker_text": "مرحباً بكم في صحيفة الذكر",
     "articles": [
         {
-            "category": "Education", 
-            "title": f"Feature Story {i}", 
-            "description": "Click to read more about this update.", 
+            "category": "Education",
+            "title": f"Feature Story {i}",
+            "description": "Click to read more.",
             "image_url": "https://via.placeholder.com/400",
-            "content": "This is the extra information that appears when you click the article."
+            "sub_image_url": "https://via.placeholder.com/600",
+            "content": "This is the sub-article content."
         } for i in range(1, 7)
     ]
 }
@@ -49,5 +52,6 @@ def update_portal(data: NewspaperData, x_admin_token: str = Header(None)):
         raise HTTPException(status_code=403, detail="Invalid Token")
     
     db["ticker_text"] = data.ticker_text
-    db["articles"] = [a.dict() for a in data.articles]
+    # Using .model_dump() is the modern Pydantic v2 approach
+    db["articles"] = [a.model_dump() for a in data.articles]
     return {"message": "Success"}

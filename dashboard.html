@@ -43,8 +43,9 @@
                 <input type="text" class="art-cat" placeholder="Category">
                 <input type="text" class="art-title" placeholder="Title">
                 <input type="text" class="art-desc" placeholder="Brief Summary">
-                <textarea class="art-content" placeholder="Full Sub-Article Content (The Extra Info)"></textarea>
-                <input type="text" class="art-img" placeholder="Image URL">
+                <textarea class="art-content" placeholder="Full Content"></textarea>
+                <input type="text" class="art-img" placeholder="Main Image URL">
+                <input type="text" class="art-sub-img" placeholder="Sub-Article Image URL">
             </div>`;
     }
 
@@ -54,6 +55,7 @@
         const descs = document.querySelectorAll('.art-desc');
         const contents = document.querySelectorAll('.art-content');
         const imgs = document.querySelectorAll('.art-img');
+        const subImgs = document.querySelectorAll('.art-sub-img');
         
         const list = [];
         for (let i = 0; i < 6; i++) {
@@ -62,19 +64,33 @@
                 title: titles[i].value,
                 description: descs[i].value,
                 content: contents[i].value,
-                image_url: imgs[i].value || "https://via.placeholder.com/400"
+                image_url: imgs[i].value || "https://via.placeholder.com/400",
+                sub_image_url: subImgs[i].value || "https://via.placeholder.com/400"
             });
         }
 
-        const res = await fetch('https://daralthikrnewspaper.onrender.com/update', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'x-admin-token': 'DarAlThikr_Secret_2026' },
-            body: JSON.stringify({
-                ticker_text: document.getElementById('ticker_text').value,
-                articles: list
-            })
-        });
-        if(res.ok) alert("Live!");
+        try {
+            const res = await fetch('https://daralthikrnewspaper.onrender.com/update', {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json', 
+                    'x-admin-token': 'DarAlThikr_Secret_2026' 
+                },
+                body: JSON.stringify({
+                    ticker_text: document.getElementById('ticker_text').value,
+                    articles: list
+                })
+            });
+            
+            if(res.ok) {
+                alert("Live!");
+            } else {
+                alert("Update failed. Check your connection or token.");
+            }
+        } catch (error) {
+            console.error("Error:", error);
+            alert("An error occurred while publishing.");
+        }
     }
 </script>
 </body>

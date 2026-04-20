@@ -32,14 +32,16 @@
         if(document.getElementById('pass').value === "DarAlThikr2026") {
             document.getElementById('auth-gate').style.display = 'none';
             document.getElementById('main-content').style.display = 'block';
+            fetchCurrentData(); // This now pulls the data immediately
         } else { alert("Wrong Password"); }
     }
 
+    // Initialize the inputs first
     const container = document.getElementById('articles-inputs');
-    for (let i = 1; i <= 6; i++) {
+    for (let i = 0; i < 6; i++) {
         container.innerHTML += `
             <div class="admin-card">
-                <h3>Article #${i}</h3>
+                <h3>Article #${i + 1}</h3>
                 <input type="text" class="art-cat" placeholder="Category">
                 <input type="text" class="art-title" placeholder="Title">
                 <input type="text" class="art-desc" placeholder="Brief Summary">
@@ -49,7 +51,36 @@
             </div>`;
     }
 
+    // NEW: Function to fill inputs with current server data
+    async function fetchCurrentData() {
+        try {
+            const res = await fetch('https://daralthikrnewspaper.onrender.com/status');
+            const data = await res.json();
+            
+            document.getElementById('ticker_text').value = data.ticker_text || "";
+            
+            const cats = document.querySelectorAll('.art-cat');
+            const titles = document.querySelectorAll('.art-title');
+            const descs = document.querySelectorAll('.art-desc');
+            const contents = document.querySelectorAll('.art-content');
+            const imgs = document.querySelectorAll('.art-img');
+            const subImgs = document.querySelectorAll('.art-sub-img');
+            
+            data.articles.forEach((art, i) => {
+                if(i < 6) {
+                    cats[i].value = art.category || "";
+                    titles[i].value = art.title || "";
+                    descs[i].value = art.description || "";
+                    contents[i].value = art.content || "";
+                    imgs[i].value = art.image_url || "";
+                    subImgs[i].value = art.sub_image_url || "";
+                }
+            });
+        } catch (e) { console.error("Could not fetch data:", e); }
+    }
+
     async function publishUpdate() {
+        // ... (your existing publishUpdate code remains the same)
         const cats = document.querySelectorAll('.art-cat');
         const titles = document.querySelectorAll('.art-title');
         const descs = document.querySelectorAll('.art-desc');
@@ -82,15 +113,9 @@
                 })
             });
             
-            if(res.ok) {
-                alert("Live!");
-            } else {
-                alert("Update failed. Check your connection or token.");
-            }
-        } catch (error) {
-            console.error("Error:", error);
-            alert("An error occurred while publishing.");
-        }
+            if(res.ok) { alert("Live!"); } 
+            else { alert("Update failed."); }
+        } catch (error) { alert("An error occurred."); }
     }
 </script>
 </body>

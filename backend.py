@@ -1,3 +1,5 @@
+import json
+import os
 from fastapi import FastAPI, HTTPException, Header
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -14,44 +16,50 @@ app.add_middleware(
 )
 
 ADMIN_TOKEN = "DarAlThikr_Secret_2026"
+DATA_FILE = "newspaper_data.json"
 
 class Article(BaseModel):
     category: str
     title: str
     description: str
     image_url: str
-    sub_image_url: str  # Added this field
+    sub_image_url: str
     content: str
 
 class NewspaperData(BaseModel):
     ticker_text: str
     articles: List[Article]
 
-# Initialized database with the new structure
-db = {
-    "ticker_text": "مرحباً بكم في صحيفة الذكر",
-    "articles": [
-        {
-            "category": "Education",
-            "title": f"Feature Story {i}",
-            "description": "Click to read more.",
-            "image_url": "https://via.placeholder.com/400",
-            "sub_image_url": "https://via.placeholder.com/600",
-            "content": "This is the sub-article content."
-        } for i in range(1, 7)
-    ]
-}
+# Helper: Load data from JSON file
+def load_data():
+    if not os.path.exists(DATA_FILE):
+        # Default empty structure if the file doesn't exist
+        return {
+            "ticker_text": "مرحباً بكم في صحيفة الذكر",
+            "articles": [{"category": "عام", "title": "عنوان", "description": "وصف", "image_url": "", "sub_image_url": "", "content": ""} for _ in range(6)]
+        }
+    
+    with open(DATA_FILE, "r", encoding="utf-8") as f:
+        try:
+            return json.load(f)
+        except json.JSONDecodeError:
+            # If the file is somehow corrupted, return default
+            return {"ticker_text": "خطأ في البيانات", "articles": []}
+
+# Helper: Save data to JSON file
+def save_data(data):
+    with open(DATA_FILE, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=4)
 
 @app.get("/status")
 def get_status():
-    return db
+    return load_data()
 
 @app.post("/update")
 def update_portal(data: NewspaperData, x_admin_token: str = Header(None)):
     if x_admin_token != ADMIN_TOKEN:
         raise HTTPException(status_code=403, detail="Invalid Token")
     
-    db["ticker_text"] = data.ticker_text
-    # Using .model_dump() is the modern Pydantic v2 approach
-    db["articles"] = [a.model_dump() for a in data.articles]
+    # Save the new data structure to the JSON file
+    save_data(data.model_dump())
     return {"message": "Success"}

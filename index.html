@@ -11,44 +11,26 @@
         .header-section { border-bottom: 4px double #333; padding: 20px 0; margin-bottom: 30px; text-align: center; }
         .school-logo { max-width: 120px; margin-bottom: 15px; filter: grayscale(100%); }
         .newspaper-title { font-size: 3.5rem; font-weight: 900; margin: 0; }
-        .article-odd, .article-even { background: #fff; padding: 20px; border: 1px solid #ccc; box-shadow: -5px 5px 0px #ddd; margin-bottom: 20px; }
+        .article-odd { background: #fff; padding: 20px; border: 1px solid #ccc; box-shadow: -5px 5px 0px #ddd; margin-bottom: 20px; }
         .featured-image { width: 100%; height: 200px; object-fit: cover; filter: sepia(0.2); margin-bottom: 15px; }
         .btn-read { background: #333; color: white; border: none; padding: 8px 20px; cursor: pointer; }
         
-        /* Modal Fixes */
-        .modal-body { display: flex; flex-direction: column; align-items: center; padding: 30px; }
-        #m-img, #m-sub-img { max-width: 100%; margin-bottom: 15px; }
-        #m-content { width: 100%; line-height: 1.8; text-align: justify; word-wrap: break-word; }
+        @keyframes scroll-left {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
     </style>
 </head>
 
 <body>
 
 <header class="header-section">
-    <div class="ticker-container" style="background: #333; color: white; padding: 10px; overflow: hidden; margin-bottom: 20px;">
-    <div class="ticker-container" style="background: #333; color: white; padding: 10px; overflow: hidden; margin-bottom: 20px; white-space: nowrap; position: relative;">
-   
-
-
-
-        <div id="ticker-text" style="display: inline-block; animation: scroll-left 15s linear infinite;">
-        جاري التحميل...
+    <div style="background: #333; color: white; padding: 10px; overflow: hidden; margin-bottom: 20px; white-space: nowrap; position: relative;">
+        <div id="ticker-text" style="display: inline-block; animation: scroll-left 15s linear infinite;">جاري التحميل...</div>
     </div>
-</div>
-
-<style>
-    @keyframes scroll-left {
-        0% { transform: translateX(100%); }
-        100% { transform: translateX(-100%); }
-    }
-</style>
-
-
-
-</div>
     <div class="container">
         <img src="logo-removebg-preview.png" class="school-logo" alt="Logo">
-        <h1 class="newspaper-title"> صحيفة دار الذكر الثانوية</h1>
+        <h1 class="newspaper-title">صحيفة دار الذكر الثانوية</h1>
         <p>جدة، المملكة العربية السعودية • <span id="current-date"></span></p>
     </div>
 </header>
@@ -59,68 +41,70 @@
   <div class="modal-dialog modal-lg">
     <div class="modal-content" style="background: #f4f1ea;">
       <div class="modal-header"><h5 id="m-title" style="font-weight: bold;"></h5></div>
-      <div class="modal-body">
-        <img id="m-img" class="img-fluid">
-        <img id="m-sub-img" class="img-fluid">
-        <p id="m-content"></p>
+      <div class="modal-body" style="display: flex; flex-direction: column; align-items: center;">
+        <img id="m-img" class="img-fluid" style="margin-bottom: 10px; height: 300px; object-fit: cover;">
+        <div style="margin-bottom: 20px;">
+            <button class="btn btn-secondary" onclick="changeSlide(-1)">← Prev</button>
+            <button class="btn btn-secondary" onclick="changeSlide(1)">Next →</button>
+        </div>
+        <p id="m-content" style="width: 100%; text-align: justify;"></p>
       </div>
     </div>
   </div>
 </div>
 
+<footer style="text-align: center; padding: 40px; background: #0d0d0d; color: #f5f3f5; margin-top: 50px;">
+    <p>&copy; 2026 Al-Thikr Times All Rights Reserved</p>
+    <p>Designed and Developed by Mohamed Mostafa Al-Sharif</p>
+</footer>
+
 <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-    // Updated to Gregorian, including the full day name
-document.getElementById('current-date').innerText = new Date().toLocaleDateString('en-GB', { 
-    weekday: 'long', 
-    day: 'numeric', 
-    month: 'long', 
-    year: 'numeric' 
-});
+    document.getElementById('current-date').innerText = new Date().toLocaleDateString('en-GB', { 
+        weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' 
+    });
+
+    let currentImgIndex = 0;
+    let modalImages = [];
 
     async function syncNewspaper() {
         try {
-            
             const response = await fetch('https://daralthikrnewspaper.onrender.com/status?t=' + new Date().getTime());
             const data = await response.json();
-            
             document.getElementById('ticker-text').innerText = data.ticker_text;
-
             const mainRow = document.getElementById('main-news-container');
             mainRow.innerHTML = ''; 
-
-            data.articles.forEach((article) => {
-                const articleHTML = `
+            data.articles.forEach((art) => {
+                mainRow.insertAdjacentHTML('beforeend', `
                     <div class="col-md-4">
                         <div class="article-odd">
-                            <img src="${article.image_url}" class="featured-image">
-                            <h3>${article.title}</h3>
-                            <p>${article.description}</p>
-                            <button class="btn-read" onclick="showSub('${article.title}', '${article.image_url}', '${article.sub_image_url}', \`${article.content}\`)">اقرأ المزيد ←</button>
+                            <img src="${art.image_url}" class="featured-image">
+                            <h3>${art.title}</h3>
+                            <p>${art.description}</p>
+                            <button class="btn-read" onclick="showSub('${art.title}', '${art.image_url}', '${art.sub_image_url}', \`${art.content}\`)">اقرأ المزيد ←</button>
                         </div>
-                    </div>
-                `;
-                mainRow.insertAdjacentHTML('beforeend', articleHTML);
+                    </div>`);
             });
         } catch (e) { console.log("Offline"); }
     }
 
     function showSub(title, img, subImg, content) {
+        modalImages = [img, subImg];
+        currentImgIndex = 0;
         document.getElementById('m-title').innerText = title;
-        document.getElementById('m-img').src = img;
-        document.getElementById('m-sub-img').src = subImg; // Loads the sub-image
+        document.getElementById('m-img').src = modalImages[currentImgIndex];
         document.getElementById('m-content').innerText = content;
         $('#articleModal').modal('show');
-        document.getElementById('ticker-text').innerText = data.ticker_text;
+    }
+
+    function changeSlide(dir) {
+        currentImgIndex = (currentImgIndex + dir + modalImages.length) % modalImages.length;
+        document.getElementById('m-img').src = modalImages[currentImgIndex];
     }
 
     syncNewspaper();
 </script>
-<footer style="text-align: center; padding: 40px; background: #0d0d0d; color: rgb(245, 243, 245); margin-top: 50px;">
-    <p>&copy; 2026 Al-Thikr Times All Rights Reserved</p>
-    <p>Designed and Developed by Mohamed Mostafa Al-Sharif</p>
-</footer>
 </body>
 </html>

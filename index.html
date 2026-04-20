@@ -72,7 +72,13 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-    document.getElementById('current-date').innerText = new Date().toLocaleDateString('ar-SA', { day: 'numeric', month: 'long', year: 'numeric' });
+    // Updated to Gregorian, including the full day name
+document.getElementById('current-date').innerText = new Date().toLocaleDateString('en-GB', { 
+    weekday: 'long', 
+    day: 'numeric', 
+    month: 'long', 
+    year: 'numeric' 
+});
 
     async function syncNewspaper() {
         try {

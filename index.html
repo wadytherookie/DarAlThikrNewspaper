@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
-    
     <style>
         body { background-color: #f4f1ea; color: #1a1a1a; font-family: 'Cairo', sans-serif; }
         .header-section { border-bottom: 4px double #333; padding: 20px 0; margin-bottom: 30px; text-align: center; }
@@ -13,20 +12,18 @@
         .newspaper-title { font-size: 3.5rem; font-weight: 900; margin: 0; }
         .article-odd { background: #fff; padding: 20px; border: 1px solid #ccc; box-shadow: -5px 5px 0px #ddd; margin-bottom: 20px; }
         .featured-image { width: 100%; height: 200px; object-fit: cover; filter: sepia(0.2); margin-bottom: 15px; }
-        .btn-read { background: #333; color: white; border: none; padding: 8px 20px; cursor: pointer; }
+        .btn-read { background: #333; color: white; border: none; padding: 8px 20px; cursor: pointer; display: inline-block; margin-top: 10px; }
         
-        @keyframes scroll-left {
-            0% { transform: translateX(100%); }
-            100% { transform: translateX(-100%); }
-        }
+        #ticker-wrapper { background: #333; color: white; padding: 10px; overflow: hidden; margin-bottom: 20px; position: relative; }
+        #ticker-text { display: inline-block; white-space: nowrap; padding-left: 100%; animation: scroll-left 20s linear infinite; }
+        @keyframes scroll-left { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
     </style>
 </head>
-
 <body>
 
 <header class="header-section">
-    <div style="background: #333; color: white; padding: 10px; overflow: hidden; margin-bottom: 20px; white-space: nowrap; position: relative;">
-        <div id="ticker-text" style="display: inline-block; animation: scroll-left 15s linear infinite;">جاري التحميل...</div>
+    <div id="ticker-wrapper">
+        <div id="ticker-text">جاري تحميل الأخبار...</div>
     </div>
     <div class="container">
         <img src="logo-removebg-preview.png" class="school-logo" alt="Logo">
@@ -44,8 +41,8 @@
       <div class="modal-body" style="display: flex; flex-direction: column; align-items: center;">
         <img id="m-img" class="img-fluid" style="margin-bottom: 10px; height: 300px; object-fit: cover;">
         <div style="margin-bottom: 20px;">
-            <button class="btn btn-secondary" onclick="changeSlide(-1)">← Prev</button>
-            <button class="btn btn-secondary" onclick="changeSlide(1)">Next →</button>
+            <button class="btn btn-secondary" onclick="changeSlide(1)">التالي →</button>
+            <button class="btn btn-secondary" onclick="changeSlide(-1)">← السابق</button>
         </div>
         <p id="m-content" style="width: 100%; text-align: justify;"></p>
       </div>
@@ -62,7 +59,7 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-    document.getElementById('current-date').innerText = new Date().toLocaleDateString('en-GB', { 
+    document.getElementById('current-date').innerText = new Date().toLocaleDateString('ar-SA', { 
         weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' 
     });
 
@@ -76,22 +73,31 @@
             document.getElementById('ticker-text').innerText = data.ticker_text;
             const mainRow = document.getElementById('main-news-container');
             mainRow.innerHTML = ''; 
+            
             data.articles.forEach((art) => {
-                mainRow.insertAdjacentHTML('beforeend', `
-                    <div class="col-md-4">
-                        <div class="article-odd">
-                            <img src="${art.image_url}" class="featured-image">
-                            <h3>${art.title}</h3>
-                            <p>${art.description}</p>
-                            <button class="btn-read" onclick="showSub('${art.title}', '${art.image_url}', '${art.sub_image_url}', \`${art.content}\`)">اقرأ المزيد ←</button>
-                        </div>
-                    </div>`);
+                const col = document.createElement('div');
+                col.className = 'col-md-4';
+                col.innerHTML = `
+                    <div class="article-odd">
+                        <img src="${art.image_url}" class="featured-image">
+                        <h3>${art.title}</h3>
+                        <p>${art.description}</p>
+                    </div>`;
+                
+                const btn = document.createElement('button');
+                btn.className = 'btn-read';
+                btn.innerText = 'اقرأ المزيد ←';
+                // Pass up to 5 image fields
+                btn.onclick = () => showSub(art.title, art.image_url, art.sub_image_1, art.sub_image_2, art.sub_image_3, art.sub_image_4, art.content);
+                
+                col.querySelector('.article-odd').appendChild(btn);
+                mainRow.appendChild(col);
             });
-        } catch (e) { console.log("Offline"); }
+        } catch (e) { console.log("Connection Failed"); }
     }
 
-    function showSub(title, img, subImg, content) {
-        modalImages = [img, subImg];
+    function showSub(title, img, s1, s2, s3, s4, content) {
+        modalImages = [img, s1, s2, s3, s4].filter(i => i && i !== "null" && i !== null);
         currentImgIndex = 0;
         document.getElementById('m-title').innerText = title;
         document.getElementById('m-img').src = modalImages[currentImgIndex];
@@ -100,11 +106,13 @@
     }
 
     function changeSlide(dir) {
-        currentImgIndex = (currentImgIndex + dir + modalImages.length) % modalImages.length;
-        document.getElementById('m-img').src = modalImages[currentImgIndex];
+        if(modalImages.length > 0) {
+            currentImgIndex = (currentImgIndex + dir + modalImages.length) % modalImages.length;
+            document.getElementById('m-img').src = modalImages[currentImgIndex];
+        }
     }
 
-    syncNewspaper();
+    window.onload = syncNewspaper;
 </script>
 </body>
 </html>

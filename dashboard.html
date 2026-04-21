@@ -3,7 +3,7 @@
 <head>
     <style>
         body { background: #121212; color: white; font-family: sans-serif; padding: 50px; }
-        .admin-card { background: #1e1e1e; padding: 20px; border-radius: 10px; margin-bottom: 20px; }
+        .admin-card { background: #1e1e1e; padding: 20px; border-radius: 10px; margin-bottom: 20px; border-left: 5px solid #2ecc71; }
         input, textarea { width: 100%; margin-bottom: 10px; background: #333; color: white; border: 1px solid #444; padding: 10px; }
         button { background: #2ecc71; color: black; font-weight: bold; width: 100%; padding: 20px; border: none; cursor: pointer; }
         #auth-gate { text-align: center; margin-top: 100px; }
@@ -13,7 +13,7 @@
 
 <div id="auth-gate">
     <h2>🔒 Control Center Locked</h2>
-    <input type="password" id="pass" placeholder="Enter Admin Password" style="width: 300px;">
+    <input type="password" id="pass" placeholder="Enter Admin Password" style="width: 300px; text-align: center;">
     <br>
     <button onclick="checkPass()" style="width: 300px;">Login</button>
 </div>
@@ -24,7 +24,7 @@
     <input type="text" id="ticker_text">
     
     <div id="articles-inputs"></div>
-    <button onclick="publishUpdate()">PUBLISH TO NEWSPAPER</button>
+    <button onclick="publishUpdate()">PUBLISH ALL CHANGES</button>
 </div>
 
 <script>
@@ -32,11 +32,11 @@
         if(document.getElementById('pass').value === "DarAlThikr2026") {
             document.getElementById('auth-gate').style.display = 'none';
             document.getElementById('main-content').style.display = 'block';
-            fetchCurrentData(); // This now pulls the data immediately
+            fetchCurrentData();
         } else { alert("Wrong Password"); }
     }
 
-    // Initialize the inputs first
+    // Generate 6 article slots
     const container = document.getElementById('articles-inputs');
     for (let i = 0; i < 6; i++) {
         container.innerHTML += `
@@ -47,75 +47,62 @@
                 <input type="text" class="art-desc" placeholder="Brief Summary">
                 <textarea class="art-content" placeholder="Full Content"></textarea>
                 <input type="text" class="art-img" placeholder="Main Image URL">
-                <input type="text" class="art-sub-img" placeholder="Sub-Article Image URL">
+                <input type="text" class="art-sub-1" placeholder="Sub-Image 1 URL">
+                <input type="text" class="art-sub-2" placeholder="Sub-Image 2 URL">
+                <input type="text" class="art-sub-3" placeholder="Sub-Image 3 URL">
+                <input type="text" class="art-sub-4" placeholder="Sub-Image 4 URL">
             </div>`;
     }
 
-    // NEW: Function to fill inputs with current server data
     async function fetchCurrentData() {
         try {
             const res = await fetch('https://daralthikrnewspaper.onrender.com/status');
             const data = await res.json();
-            
             document.getElementById('ticker_text').value = data.ticker_text || "";
-            
-            const cats = document.querySelectorAll('.art-cat');
-            const titles = document.querySelectorAll('.art-title');
-            const descs = document.querySelectorAll('.art-desc');
-            const contents = document.querySelectorAll('.art-content');
-            const imgs = document.querySelectorAll('.art-img');
-            const subImgs = document.querySelectorAll('.art-sub-img');
             
             data.articles.forEach((art, i) => {
                 if(i < 6) {
-                    cats[i].value = art.category || "";
-                    titles[i].value = art.title || "";
-                    descs[i].value = art.description || "";
-                    contents[i].value = art.content || "";
-                    imgs[i].value = art.image_url || "";
-                    subImgs[i].value = art.sub_image_url || "";
+                    document.querySelectorAll('.art-cat')[i].value = art.category || "";
+                    document.querySelectorAll('.art-title')[i].value = art.title || "";
+                    document.querySelectorAll('.art-desc')[i].value = art.description || "";
+                    document.querySelectorAll('.art-content')[i].value = art.content || "";
+                    document.querySelectorAll('.art-img')[i].value = art.image_url || "";
+                    document.querySelectorAll('.art-sub-1')[i].value = art.sub_image_1 || "";
+                    document.querySelectorAll('.art-sub-2')[i].value = art.sub_image_2 || "";
+                    document.querySelectorAll('.art-sub-3')[i].value = art.sub_image_3 || "";
+                    document.querySelectorAll('.art-sub-4')[i].value = art.sub_image_4 || "";
                 }
             });
-        } catch (e) { console.error("Could not fetch data:", e); }
+        } catch (e) { console.error("Could not fetch:", e); }
     }
 
     async function publishUpdate() {
-        // ... (your existing publishUpdate code remains the same)
-        const cats = document.querySelectorAll('.art-cat');
-        const titles = document.querySelectorAll('.art-title');
-        const descs = document.querySelectorAll('.art-desc');
-        const contents = document.querySelectorAll('.art-content');
-        const imgs = document.querySelectorAll('.art-img');
-        const subImgs = document.querySelectorAll('.art-sub-img');
-        
         const list = [];
         for (let i = 0; i < 6; i++) {
             list.push({
-                category: cats[i].value,
-                title: titles[i].value,
-                description: descs[i].value,
-                content: contents[i].value,
-                image_url: imgs[i].value || "https://via.placeholder.com/400",
-                sub_image_url: subImgs[i].value || "https://via.placeholder.com/400"
+                category: document.querySelectorAll('.art-cat')[i].value,
+                title: document.querySelectorAll('.art-title')[i].value,
+                description: document.querySelectorAll('.art-desc')[i].value,
+                content: document.querySelectorAll('.art-content')[i].value,
+                image_url: document.querySelectorAll('.art-img')[i].value,
+                sub_image_1: document.querySelectorAll('.art-sub-1')[i].value,
+                sub_image_2: document.querySelectorAll('.art-sub-2')[i].value,
+                sub_image_3: document.querySelectorAll('.art-sub-3')[i].value,
+                sub_image_4: document.querySelectorAll('.art-sub-4')[i].value
             });
         }
 
         try {
             const res = await fetch('https://daralthikrnewspaper.onrender.com/update', {
                 method: 'POST',
-                headers: { 
-                    'Content-Type': 'application/json', 
-                    'x-admin-token': 'DarAlThikr_Secret_2026' 
-                },
+                headers: { 'Content-Type': 'application/json', 'x-admin-token': 'DarAlThikr_Secret_2026' },
                 body: JSON.stringify({
                     ticker_text: document.getElementById('ticker_text').value,
                     articles: list
                 })
             });
-            
-            if(res.ok) { alert("Live!"); } 
-            else { alert("Update failed."); }
-        } catch (error) { alert("An error occurred."); }
+            if(res.ok) alert("Live!"); else alert("Update failed.");
+        } catch (error) { alert("Error sending update."); }
     }
 </script>
 </body>

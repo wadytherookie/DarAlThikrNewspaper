@@ -18,11 +18,11 @@
         #ticker-text { display: inline-block; white-space: nowrap; padding-left: 100%; animation: scroll-left 20s linear infinite; }
         @keyframes scroll-left { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
         .school-logo { 
-    max-width: 150px; /* Made it slightly larger to be the focal point */
-    margin-bottom: 15px; 
-    filter: none; /* Removes grayscale for full brand colors */
-    drop-shadow: 0px 4px 6px rgba(0,0,0,0.1); /* Subtle shadow for depth */
-}
+            max-width: 150px; 
+            margin-bottom: 15px; 
+            filter: none; 
+            drop-shadow: 0px 4px 6px rgba(0,0,0,0.1); 
+        }
     </style>
 </head>
 <body>
@@ -43,7 +43,12 @@
 <div class="modal fade" id="articleModal">
   <div class="modal-dialog modal-lg">
     <div class="modal-content" style="background: #f4f1ea;">
-      <div class="modal-header"><h5 id="m-title" style="font-weight: bold;"></h5></div>
+      <div class="modal-header">
+        <h5 id="m-title" style="font-weight: bold;"></h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="margin: 0;">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
       <div class="modal-body" style="display: flex; flex-direction: column; align-items: center;">
         <img id="m-img" class="img-fluid" style="margin-bottom: 10px; height: 300px; object-fit: cover;">
         <div style="margin-bottom: 20px;">
@@ -51,6 +56,9 @@
             <button class="btn btn-secondary" onclick="changeSlide(-1)">← السابق</button>
         </div>
         <p id="m-content" style="width: 100%; text-align: justify;"></p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-dark" data-dismiss="modal">إغلاق</button>
       </div>
     </div>
   </div>
@@ -93,7 +101,6 @@
                 const btn = document.createElement('button');
                 btn.className = 'btn-read';
                 btn.innerText = 'اقرأ المزيد ←';
-                // Pass up to 5 image fields
                 btn.onclick = () => showSub(art.title, art.image_url, art.sub_image_1, art.sub_image_2, art.sub_image_3, art.sub_image_4, art.content);
                 
                 col.querySelector('.article-odd').appendChild(btn);

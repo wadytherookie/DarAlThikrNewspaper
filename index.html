@@ -77,6 +77,9 @@
     document.getElementById('current-date').innerText = new Date().toLocaleDateString('ar-SA', { 
         weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' 
     });
+    document.getElementById('current-date').innerText = new Date().toLocaleDateString('en-US', {
+        weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+    });
 
     let currentImgIndex = 0;
     let modalImages = [];

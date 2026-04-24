@@ -16,7 +16,7 @@ app.add_middleware(
 )
 
 # Connect to MongoDB (Replace with your actual string!)
-MONGO_URI = "mongodb+srv://therookiebeer_db_user:<db_password>@cluster0.bmo0g8u.mongodb.net/?appName=Cluster0"
+MONGO_URI = "mongodb+srv://therookiebeer_db_user:<6ubJGNwXSlKXkvdb>@cluster0.bmo0g8u.mongodb.net/?appName=Cluster0"
 client = MongoClient(MONGO_URI)
 db = client["newspaper_db"]
 collection = db["articles"]

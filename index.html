@@ -83,11 +83,18 @@
     async function syncNewspaper() {
         try {
             const response = await fetch('https://daralthikrnewspaper.onrender.com/status?t=' + new Date().getTime());
+            
+            // If the response is not ok, stop here to avoid clearing the screen
+            if (!response.ok) throw new Error("API not responding");
+
             const data = await response.json();
-            document.getElementById('ticker-text').innerText = data.ticker_text;
+            
+            // Only clear and update IF we successfully got new data
             const mainRow = document.getElementById('main-news-container');
             mainRow.innerHTML = ''; 
             
+            document.getElementById('ticker-text').innerText = data.ticker_text;
+
             data.articles.forEach((art) => {
                 const col = document.createElement('div');
                 col.className = 'col-md-4';
@@ -106,7 +113,10 @@
                 col.querySelector('.article-odd').appendChild(btn);
                 mainRow.appendChild(col);
             });
-        } catch (e) { console.log("Connection Failed"); }
+            console.log("News updated successfully");
+        } catch (e) { 
+            console.log("Connection Failed or Server Sleeping. Keeping existing content."); 
+        }
     }
 
     function showSub(title, img, s1, s2, s3, s4, content) {
@@ -125,7 +135,11 @@
         }
     }
 
+    // Run once on load
     window.onload = syncNewspaper;
+
+    // Refresh every 10 minutes (600,000 milliseconds)
+    setInterval(syncNewspaper, 60000);
 </script>
 </body>
 </html>

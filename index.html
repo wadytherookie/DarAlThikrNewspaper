@@ -65,21 +65,28 @@
   </div>
 </div>
 
-<footer style="text-align: center; padding: 40px; background: #0d0d0d; color: #f5f3f5; margin-top: 50px;">
-    <p>&copy; 2026 Al-Thikr Times All Rights Reserved</p>
-    <p>Designed and Developed by Mohamed Mostafa Al-Sharif</p>
+<footer style="text-align: center; padding: 40px; background: #0d0d0d; color: #f5f3f5; margin-top: 50px; font-family: 'Cairo', sans-serif;">
+    <p>&copy; 2026 صحيفة دار الذكر. جميع الحقوق محفوظة.</p>
+    <p>تصميم وتطوير: محمد مصطفى الشريف</p>
 </footer>
-
 <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-    document.getElementById('current-date').innerText = new Date().toLocaleDateString('ar-SA', { 
-        weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' 
-    });
-    document.getElementById('current-date').innerText = new Date().toLocaleDateString('en-US', {
-        weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
-    });
+// Get Gregorian Date using standard Arabic
+// 1. Gregorian Date (Standard)
+const dateOptions = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
+
+// 1. Gregorian Engine
+const gregorianFormatter = new Intl.DateTimeFormat('ar-ar', dateOptions);
+
+// 2. Hijri Engine (Explicitly setting the calendar)
+const hijriFormatter = new Intl.DateTimeFormat('ar-SA-u-ca-islamic-uma', dateOptions);
+
+const gregorianDate = gregorianFormatter.format(new Date());
+const hijriDate = hijriFormatter.format(new Date());
+
+document.getElementById('current-date').innerText = `${gregorianDate} • ${hijriDate}`;
 
     let currentImgIndex = 0;
     let modalImages = [];

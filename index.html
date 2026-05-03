@@ -23,6 +23,54 @@
             filter: none; 
             drop-shadow: 0px 4px 6px rgba(0,0,0,0.1); 
         }
+              /* Make all article columns equal height */
+#main-news-container .col-md-4 {
+    display: flex;
+    margin-bottom: 35px;
+}
+
+/* Make every article card the same size */
+.article-odd {
+    width: 100%;
+    height: 430px; /* You can increase/decrease this */
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* Keep image fixed */
+.featured-image {
+    height: 200px;
+    flex-shrink: 0;
+}
+
+/* Limit title height */
+.article-odd h3 {
+    font-size: 1.3rem;
+    line-height: 1.5;
+    height: 60px;
+    overflow: hidden;
+
+    display: -webkit-box;
+    -webkit-line-clamp: 2; /* maximum 2 lines */
+    -webkit-box-orient: vertical;
+}
+
+/* Limit description height */
+.article-odd p {
+    line-height: 1.6;
+    height: 75px;
+    overflow: hidden;
+
+    display: -webkit-box;
+    -webkit-line-clamp: 3; /* maximum 3 lines */
+    -webkit-box-orient: vertical;
+}
+
+/* Keep button at bottom */
+.btn-read {
+    margin-top: auto;
+}
     </style>
     <link rel="icon" type="image/png" href="logo-removebg-preview.png">
 </head>
@@ -53,8 +101,8 @@
       <div class="modal-body" style="display: flex; flex-direction: column; align-items: center;">
         <img id="m-img" class="img-fluid" style="margin-bottom: 10px; height: 300px; object-fit: cover;">
         <div style="margin-bottom: 20px;">
-            <button class="btn btn-secondary" onclick="changeSlide(1)">التالي →</button>
-            <button class="btn btn-secondary" onclick="changeSlide(-1)">← السابق</button>
+            <button class="btn btn-secondary" onclick="changeSlide(1)">التالي </button>
+            <button class="btn btn-secondary" onclick="changeSlide(-1)"> السابق</button>
         </div>
         <p id="m-content" style="width: 100%; text-align: justify;"></p>
       </div>
